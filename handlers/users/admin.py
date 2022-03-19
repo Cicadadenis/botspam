@@ -1,15 +1,15 @@
 import asyncio
-
-from telethon.tl.types.help import UserInfoEmpty
 import os
-from settings_2 import api_id_x, api_hash_x, ti, file_list, sessions,  uzik, sms
 import random
+from random import randint
 from telethon import TelegramClient, Button, events 
 from datetime import datetime, timedelta
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import Unauthorized
+
+from keyboards.inline.menu import back_admin, admin_menu, choose_menu
 from loader import dp, bot
 from states.states import BroadcastState, GiveTime, TakeTime
 from utils.db_api.db_commands import select_all_users, del_user, update_date
@@ -19,9 +19,10 @@ import random
 from telethon.sessions import StringSession
 from telethon.tl.custom import Button
 from datetime import datetime
+from telethon.tl.functions.channels import InviteToChannelRequest
 import asyncio
 from keyboards.inline.menu import back_to_main_menu,  api_hash, api_id, code_menu, \
-    main_menu, proxy_menu, start_spam_menu, accept_spam_menu, STOP
+    main_menu, proxy_menu, start_spam_menu, accept_spam_menu
 import socks
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon import TelegramClient
@@ -45,8 +46,6 @@ import os
 from telethon.sync import TelegramClient
 from telethon import functions, types
 from datetime import datetime, timedelta
-from telethon.sync import TelegramClient
-from telethon import functions, types
 
 class sms2(StatesGroup):
     sms_text = State()
@@ -93,16 +92,12 @@ async def rep(call: CallbackQuery):
             mm = 0
             file_list = os.listdir('sessions')
             acaunt = file_list[i]
-            try:
-                cli = open(f"sessions/{acaunt}").read()
-                client = TelegramClient(StringSession(cli), api_id, api_hash)
-                await client.connect()
-            except:
-                client = TelegramClient(f"sessions/{acaunt}", api_id, api_hash)
-                await client.connect()
+            cli = open(f"sessions/{acaunt}").read()
+            client = TelegramClient(StringSession(cli), api_id, api_hash)
+            await client.connect()
             if mm <= 40:
                 try:
-                    ssm = open('sms.txt', 'r', encoding="UTF-8").read()
+                    ssm = open('sms.txt', 'r').read()
                     zz = ssm.split('|')
                     sms = random.choice(zz)
                     ss = open('ussers.txt', 'r').readlines()
@@ -168,42 +163,6 @@ async def edit_commission(call: CallbackQuery, state: FSMContext):
     await state.update_data(msg_to_edit=msg_to_edit)
 
 
-@dp.message_handler(commands=['sat'])
-async def sta(message: Message):
-    api_id = 16746278
-    api_hash = "ca3a465d4b961e137addeb2e4f9b6581"  
-    file_list = os.listdir('sessions')
-    xx = len(file_list)
-    ss = open('ussers.txt', 'r').readlines()
-    i = 0
-    p = 0
-    t = 1
-    c = 0
-    o = 0
-    
-    acaunt = file_list[i]
-    akk = acaunt.split(".")[0]
-    ti = int(open('time.txt', 'r').read())
-    sto = open('stop.txt', 'r').read()            
-    cli = open(f"sessions/{acaunt}").read()
-    file_list2 = open('ussers.txt', 'r').readlines()
-    client = TelegramClient(StringSession(cli), api_id, api_hash)
-    await client.connect()
-    spisok = []
-    for x in file_list2:
-        try:
-            result = await client(functions.users.GetFullUserRequest(id="me"))
-            print(result) >> "79200297869.session.txt"
-            with open(f"{acaunt}.txt", 'w') as f:
-                f.write(result)
-            time.sleep(20)
-        except:
-            print("Error")
-            time.sleep(20)
-            pass
-    with open(f"spisok.txt", "w") as f:
-        f.write(str(spisok))
-
 @dp.message_handler(state=GiveTime.GT1)
 async def receive_com(message: Message, state: FSMContext):
     data = await state.get_data()
@@ -263,8 +222,6 @@ async def broadcast2(call: CallbackQuery):
 # RECEIVE PHOTO OR TEXT
 @dp.message_handler(content_types=['photo'], state=BroadcastState.BS1)
 async def broadcast4(message: Message, state: FSMContext):
-    
-    print(message.photo[-1].file_id)
     await message.delete()
     easy_chars = 'abcdefghijklnopqrstuvwxyz1234567890'
     name = 'cicada'
@@ -308,241 +265,181 @@ async def broadcast_text_post(call: CallbackQuery):
 
 from telethon import TelegramClient, sync
 
-@dp.callback_query_handler(text="STOP")
-async def st(call: CallbackQuery):
-    with open("stop.txt", "w") as f:
-        f.write("stop")
-
 
 
 
 # START BROADCAST
-#@dp.callback_query_handler(text="45")
-#async def cvb(call: CallbackQuery):
-@dp.callback_query_handler(text="go_start")
-async def broadcast_text_post(call: CallbackQuery):
+@dp.callback_query_handler(text="invait")
+async def inv(call: CallbackQuery):
+    path = f'pics/broadcast/cicada.jpg'
+    try:
+        with open(path, 'rb') as f:
+            photo = f.read()
+    except:pass
+    ti = open('time.txt', 'r').read()
     api_id = 16746278
     api_hash = "ca3a465d4b961e137addeb2e4f9b6581"  
     file_list = os.listdir('sessions')
     xx = len(file_list)
     ss = open('ussers.txt', 'r').readlines()
-    mom = len(ss)
+    z = len(ss)
+    if z <= 1:
+        await call.answer("Добать получателей список пуст !")
+        
+    count = int(z)
     i = 0
-    p = 0
-    t = 0
+    d = 0
+    s = 0
     c = 0
     o = 0
-    propusk = 0
-    while xx >= i:
-        acaunt = file_list[i]
-        akk = acaunt.split(".")[0]
-        ti = int(open('time.txt', 'r').read())
-        sto = open('stop.txt', 'r').read()
-        if sto == 'stop':
-            with open('stop.txt', 'w') as f:
-                f.write("start")
-            await call.message.answer("Рассылка остановлена", reply_markup=back_to_main_menu)
-            
+    msm = 0
+    a = 0
+    v = -1
+    while i <= xx:
         try:
+            if v == z:
+                break
+            mm = 0
+            file_list = os.listdir('sessions')
+            acaunt = file_list[i]
             cli = open(f"sessions/{acaunt}").read()
             client = TelegramClient(StringSession(cli), api_id, api_hash)
             await client.connect()
-        except:
-            client = TelegramClient(f"sessions/{acaunt}", api_id, api_hash)
-            await client.connect()
-        try:
-          with open("pics/broadcast/cicada.jpg", 'rb') as ph:
-              tot = ph.read()
-        except:
-          tot = None
-        ssm = open('sms.txt', 'r', encoding="UTF-8").read()
-        zz = ssm.split('|')
-        sms = random.choice(zz)
-        try:
-          file_list2 = open('ussers.txt', 'r').readlines()
-        except:
-          await call.message.answer("Рассылка завершена", reply_markup=back_to_main_menu)
-            
-        
-        if propusk == 10:
-            #await client.disconnect()
-            i = i + 1
-            t = t - 9
-            propusk = 0
-        if mom == 0:
-            break
-        if p >= 40:
-            await client.disconnect()
-            i = i + 1
-            p = p - 40
-        if len(file_list2) >= p:
             try:
-                far = file_list2[t][:-1]
-                await client.send_file(far, file=tot, caption=ssm)
-                p = p + 1
-                propusk = 0
-                t = t + 1
-                o = o + 1
-                result = await client(functions.users.GetFullUserRequest(id="me"))
-                nam = result.user.first_name
-                lnam = result.user.last_name
+                url = "https://t.me/cvhbbfsxvh"                          
+                await client(JoinChannelRequest(url)) 
+            except Exception as e:
+                print(e) 
                 await client.disconnect()
-                try:
-                    xxx = file_list2[t][:-1]
-                except:
-                    pass
-                await call.message.edit_text(
-                            f"✉️    <b>Рассылка с Акаунта:</b>    \n\n    <b>⚜️ {akk} 💠 {nam} {lnam} ⚜️</b>\n\n"
-                            f"<b>На пользователя 🗣 {xxx} ✅</b>\n\n"
-                            f"🛑    <b>Пауза между смс:</b>   <b>{ti} сек</b>\n"
-                            f"<b>❌     Недоставленно:  {c}</b>\n"
-                            f"<b>✅     Доставленно:    {o}</b>\n\n"
-                            f"<b>‼️ Осталось 👩‍👩‍👧‍👧 {mom}</b>", reply_markup=STOP)
-                mom = mom - 1
-                time.sleep(ti)
-            except:
-                t = t + 1
-                c = c + 1
-                result = await client(functions.users.GetFullUserRequest(id="me"))
-                nam = result.user.first_name
-                lnam = result.user.last_name
-                try:
-                    xxx = file_list2[t][:-1]
-                except:
-                    pass
-                await call.message.edit_text(
-                            f"✉️    <b>Рассылка с Акаунта:</b>    \n\n    <b>⚜️ {akk} 💠 {nam} {lnam} ⚜️</b>\n\n"
-                            f"<b>На пользователя 🗣 {xxx} ❌</b>\n\n"
-                            f"🛑    <b>Пауза между смс:</b>   <b>{ti} сек</b>\n"
-                            f"<b>❌     Недоставленно:  {c}</b>\n"
-                            f"<b>✅     Доставленно:    {o}</b>\n\n"
-                            f"<b>‼️ Осталось 👩‍👩‍👧‍👧 {mom}</b>", reply_markup=STOP)
-                time.sleep(ti/2)
-                propusk = propusk + 1
-                mom = mom - 1
-                await client.disconnect()
-        else:
-            await client.disconnect()
-            i = i + 1
-            mom = mom - 1
-    await call.message.answer("✅ <b>Рассылка Завершена</b> ✅", reply_markup=back_to_main_menu)    
+                await asyncio.sleep(1)
+                continue
+            timeoutrandome = random.randint(1, 5)
+            time.sleep(timeoutrandome)
+            invate = int(5)
+            chatentity = await client.get_entity(url)
+            real_id   = chatentity.id
+            for i in range(int(invate)):
+                # прочитаем файл построчно
+                with open('users.txt', 'r') as f:
+                    login = f.readlines()
+            try:
+                await client(InviteToChannelRequest(real_id, [login[0]]))
+                await call.message.answer("Добавлен юзер ", login[0])   
+                timeoutrandome = randint(1, 5)
+                time.sleep(timeoutrandome)
+                
+                await asyncio.sleep(1)
+            
+                 # запишем файл построчно пропустив первую строку
+                with open('users.txt', 'w') as f:
+                    f.writelines(login[1:]) 
+            except Exception as e:                
+                await call.message.answer("Неудалось добавить юзера", login[0])                 
+                await asyncio.sleep(1)
+                # запишем файл построчно пропустив первую строку
+                with open('users.txt', 'w') as f:
+                    f.writelines(login[1:])  
+                v = v + 1
+                i = i + 1   
+                                 
+                        
+        except:
+            await call.message.answer("Error")
+            break
 
 
-@dp.message_handler(text="spam")
-async def conver(call: Message):
+@dp.callback_query_handler(text="STOP")
+async def st(call: CallbackQuery):
+    with open("status.txt", "w") as f:
+        f.write("1")
 
-    api_id = 16746278
-    api_hash = "ca3a465d4b961e137addeb2e4f9b6581"  
-    file_list = os.listdir('sessions')
-    xx = len(file_list)
-    i = 0
-    while xx >= i:
-        acaunt = file_list[i]
-        number = acaunt.split(".")[0]
-        client = TelegramClient(f"convert/{acaunt}", api_id, api_hash)
-        await client.connect()
-        string = StringSession.save(client.session)
-        with open(f"sessions/{number}.session", "w") as file:
-            file.write(string)
-        await message.answer(f"Акаунт {number} Успешно конвертирован !")
-        time.sleep(3)
-        await client.disconnect()
-        i = i + 1
-
-@dp.callback_query_handler(text="lzs")
+# START BROADCAST
+@dp.callback_query_handler(text="go_start")
 async def broadcast_text_post(call: CallbackQuery):
+    path = f'pics/broadcast/cicada.jpg'
+    try:
+        with open(path, 'rb') as f:
+            photo = f.read()
+    except:pass
+    ti = open('time.txt', 'r').read()
     api_id = 16746278
     api_hash = "ca3a465d4b961e137addeb2e4f9b6581"  
     file_list = os.listdir('sessions')
     xx = len(file_list)
     ss = open('ussers.txt', 'r').readlines()
-    mom = len(ss)
+    z = len(ss)
+    if z <= 1:
+        await call.answer("Добать получателей список пуст !")
+        
+    count = int(z)
     i = 0
-    p = 0
-    t = 0
+    d = 0
+    s = 0
     c = 0
     o = 0
-    propusk = 0
-    while xx >= i:
-        acaunt = file_list[i]
-        akk = acaunt.split(".")[0]
-        ti = int(open('time.txt', 'r').read())
-        sto = open('stop.txt', 'r').read()
-        if sto == 'stop':
-            with open('stop.txt', 'w') as f:
-                f.write("start")
-            await call.message.answer("Рассылка остановлена", reply_markup=back_to_main_menu)
-            break
-            
-        cli = open(f"sessions/{acaunt}").read()
-        client = TelegramClient(StringSession(cli), api_id, api_hash)
-        await client.connect()
-        with open("pics/broadcast/cicada.jpg", 'rb') as ph:
-            tot = ph.read()
-        ssm = open('sms.txt', 'r').read()
-        zz = ssm.split('|')
-        sms = random.choice(zz)
-        file_list2 = open('ussers.txt', 'r').readlines()
-        if t > len(file_list2):
-            break
-        print(file_list2[t][:-1])
-        if propusk == 10:
-            #await client.disconnect()
-            i = i + 1
-            t = t - 9
-            propusk = 0
-        if p >= 40:
-            await client.disconnect()
-            i = i + 1
-            p = p - 40
-        if len(file_list2) >= p:
-            try:
-                far = file_list2[t][:-1]
-                await client.send_file(far, file=tot, caption=sms)
-                p = p + 1
-                propusk = 0
-                i = i + 1
-                o = o + 1
-                result = await client(functions.users.GetFullUserRequest(id="me"))
-                nam = result.user.first_name
-                lnam = result.user.last_name
-                await client.disconnect()
+    msm = 0
+    a = 0
+    v = -1
+    while i <= xx:
+        try:
+            if v == z:
+                break
+            mm = 0
+            file_list = os.listdir('sessions')
+            acaunt = file_list[i]
+            cli = open(f"sessions/{acaunt}").read()
+            client = TelegramClient(StringSession(cli), api_id, api_hash)
+            await client.connect()
+            if mm <= 40:
+                
                 try:
-                    xxx = file_list2[t][:-1]
+                    ssm = open('sms.txt', 'r').read()
+                    zz = ssm.split('|')
+                    sms = random.choice(zz)
+                    ss = open('ussers.txt', 'r').readlines()
+                    user = ss[a][:-1]
+                    #me = await client.get_me()
+                    akk = acaunt.split(".")[0]
+                    await client.send_file(ss[a][:-1], file=photo, caption=sms)
+                    await call.message.edit_text(
+                                f"✉️    <b>Рассылка с Акаунта:</b>    \n<code>{akk}</code>\n"
+                                f"<b>На пользователя 🗣 {user} ✅</b>\n\n"
+                                f"🛑    <b>Пауза между смс:</b>   <code>{ti} сек</code>\n"
+                                f"<b>❌     Недоставленно:  {c}</b>\n"
+                                f"<b>✅     Доставленно:    {o}</b>")
+                    o = o + 1
+                    msm = msm + 1
+                    mm = mm + 1
+                    v = v + 1
+                    time.sleep(ti)
+                    a = a + 1
+                    d = d + 1
+                    
+                    
                 except:
-                    break
-                await call.message.edit_text(
-                            f"✉️    <b>Рассылка с Акаунта:</b>    \n\n    <b>⚜️ {akk} 💠 {nam} {lnam} ⚜️</b>\n\n"
-                            f"<b>На пользователя 🗣 {xxx} ✅</b>\n\n"
-                            f"🛑    <b>Пауза между смс:</b>   <b>{ti} сек</b>\n"
-                            f"<b>❌     Недоставленно:  {c}</b>\n"
-                            f"<b>✅     Доставленно:    {o}</b>\n\n"
-                            f"<b>‼️ Осталось 👩‍👩‍👧‍👧 {mom}</b>", reply_markup=STOP)
-                mom = mom - 1
-                time.sleep(ti)
-            except:
-                i = i + 1
-                c = c + 1
-                result = await client(functions.users.GetFullUserRequest(id="me"))
-                nam = result.user.first_name
-                lnam = result.user.last_name
-                xxx = file_list2[t][:-1]
-                await call.message.edit_text(
-                            f"✉️    <b>Рассылка с Акаунта:</b>    \n\n    <b>⚜️ {akk} 💠 {nam} {lnam} ⚜️</b>\n\n"
-                            f"<b>На пользователя 🗣 {xxx} ❌</b>\n\n"
-                            f"🛑    <b>Пауза между смс:</b>   <b>{ti} сек</b>\n"
-                            f"<b>❌     Недоставленно:  {c}</b>\n"
-                            f"<b>✅     Доставленно:    {o}</b>\n\n"
-                            f"<b>‼️ Осталось 👩‍👩‍👧‍👧 {mom}</b>", reply_markup=STOP)
-                time.sleep(ti/2)
-                propusk = propusk + 1
-                mom = mom - 1
-                await client.disconnect()
-        else:
-            await client.disconnect()
-            i = i + 1
-            mom = mom - 1
-    await call.message.answer("✅ <b>Рассылка Завершена</b> ✅", reply_markup=back_to_main_menu)    
+                    d = d + 1
+                    a = a + 1
+                    c = c + 1
+                    v = v + 1
+                    akk = acaunt.split(".")[0]
+                    await call.message.edit_text(
+                                f"✉️    <b>Рассылка с Акаунта:</b>    \n<code>{akk}</code>\n"
+                                f"<b>На пользователя 🗣 {user} ✅</b>\n\n"
+                                f"🛑    <b>Пауза между смс:</b>   <code>{ti} сек</code>\n"
+                                f"<b>❌     Недоставленно:  {c}</b>\n"
+                                f"<b>✅     Доставленно:    {o}</b>")
+                    time.sleep(1)
+                    
+                                         
+                    
+
+        except:
+            break
+    
+            
+
+            
+    await call.message.answer("✅ <b>Рассылка Завершена</b> ✅", reply_markup=back_to_main_menu)
             
 
 @dp.callback_query_handler(text="ceker")
@@ -561,40 +458,34 @@ async def broadcast_text_post(call: CallbackQuery, state: FSMContext):
             mm = 0         
             file_list = os.listdir('sessions')
             acaunt = file_list[i]
+            cli = open(f"sessions/{acaunt}").read()
+            client = TelegramClient(StringSession(cli), api_id, api_hash)
+            await client.connect()
+           
+                    
+            
             try:
-                cli = open(f"sessions/{acaunt}").read()
-                client = TelegramClient(StringSession(cli), api_id, api_hash)
-                await client.connect()
-            except:
-                client = TelegramClient(f"sessions/{acaunt}", api_id, api_hash)
-                await client.connect()
-            try:
-                await client.connect()
-                result = await client(functions.users.GetFullUserRequest(id="me"))
-                nam = result.user.first_name
-                lnam = result.user.last_name
-                akk = acaunt.split(".")[0]
-                vremya = result.user.status.was_online
-                await call.message.answer(
-                    f"<b>Акаунт {akk} 💠 {nam} {lnam}</b> ✅\n"
-                    f"<b>Последняя активность \n{vremya}</b>")
+                #me = await client.get_me()
+                await client.send_message('me', 'Hello to myself!')
                 time.sleep(1)
+                akk = acaunt.split(".")[0]
+                await call.message.answer(f"<b>Акаунт {akk}</b> ✅")
+               
                 i = i + 1
                 r = r + 1
-                await client.disconnect()   
-            except:         
-                akk = acaunt.split(".")[0]
-                await call.message.answer(f"<b>Акаунт {akk}</b> ❌")
+                
+            except:
+                
                 path = (f"sessions/{acaunt}")
                 os.remove(path)
                 tit = tit + 1
                 time.sleep(1)
-                i = i + 1  
-            
-  
-
+                await call.message.answer(f"<b>Акаунт {akk}</b> ❌")
+                i = i + 1   
+                                 
+                        
         except:
-            i = i + 1 
+            break
             
     await call.message.answer(
                             f"🔍    <b>Проверка Завершена</b> !\n\n"
